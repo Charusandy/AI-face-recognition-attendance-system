@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Student List</title>
+</head>
+
+<body>
+
+    <ul id="studentList"></ul>
+
+    <script>
+        const students = [
+            { id: 1, name: "Arun" },
+            { id: 2, name: "Bala" },
+            { id: 3, name: "Kumar" }
+        ];
+
+        function displayStudents() {
+            const list = document.getElementById("studentList");
+            list.innerHTML = "";
+
+            students.forEach(student => {
+                const li = document.createElement("li");
+
+                li.innerHTML = `
+      ${student.name}
+      <button onclick="deleteStudent(${student.id})">Delete</button>
+    `;
+
+                list.appendChild(li);
+            });
+        }
+
+        function deleteStudent(id) {
+            fetch(`http://localhost:3000/students/${id}`, {
+                method: "DELETE"
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data.message);
+                    displayStudents(); // refresh list
+                });
+        }
+
+        displayStudents();
+    </script>
+
+</body>
+
+</html>

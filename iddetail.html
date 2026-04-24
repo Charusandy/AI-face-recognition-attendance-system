@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>QR Student Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial;
+        }
+
+        #reader {
+            width: 300px;
+            margin: auto;
+        }
+
+        table {
+            margin: auto;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        td,
+        th {
+            border: 1px solid black;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Scan Student QR</h2>
+
+    <div id="reader"></div>
+
+    <table id="studentTable">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Department</th>
+        </tr>
+    </table>
+
+    <script>
+        function addStudentToTable(student) {
+            const table = document.getElementById("studentTable");
+
+            const row = table.insertRow();
+            row.insertCell(0).innerText = student.id;
+            row.insertCell(1).innerText = student.name;
+            row.insertCell(2).innerText = student.dept;
+        }
+
+        function onScanSuccess(decodedText) {
+
+            console.log("Scanned ID:", decodedText);
+
+            // Backend call
+            fetch("http://localhost:3000/get-student", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ studentId: decodedText })
+            })
+                .then(res => res.json())
+                .then(student => {
+                    addStudentToTable(student);
+                })
+                .catch(err => {
+                    alert("Student not found");
+                });
+        }
+
+        const scanner = new Html5QrcodeScanner("reader", {
+            fps: 10,
+            qrbox: 250
+        });
+
+        scanner.render(onScanSuccess);
+    </script>
+
+</body>
+
+</html>
